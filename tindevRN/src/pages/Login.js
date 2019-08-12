@@ -8,10 +8,19 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
+import api from '../services/api';
+
 import logo from '../assets/logo.png';
 export default function Login({ navigation }) {
-  function handleLogin() {
-    navigation.navigate('Main');
+  const [user, setUser] = useState('');
+  async function handleLogin() {
+    try {
+      const response = await api.post('/devs', { username: user });
+      const { _id } = response.data;
+      navigation.navigate('Main', { _id });
+    } catch (e) {
+      console.log(e);
+    }
   }
   return (
     <KeyboardAvoidingView
@@ -26,6 +35,7 @@ export default function Login({ navigation }) {
         style={styles.input}
         placeholderTextColor="#999"
         placeholder="GitHub user"
+        onChangeText={setUser}
       />
       <TouchableOpacity style={styles.button} onPress={() => handleLogin()}>
         <Text style={styles.btnText}>Entrar</Text>
