@@ -22,13 +22,18 @@ export default function Main({navigation}) {
     loadUsers();
   }, [id]);
 
-  async function handleDislike(id) {
-    await api.post('/devs/' + id + '/dislikes', null, {headers: {user:id}});
-    setUsers(users.filter(user => user._id !== id));
+  async function handleDislike() {
+    //take first position of the array
+    //rest = users left after the first one
+    const [user,...rest] = users
+  
+    await api.post('/devs/' + user._id + '/dislikes', null, {headers: {user:id}});
+    setUsers(rest);
   }
-  async function handleLike(id) {
-    await api.post('/devs/' + id + '/likes', null, {headers: {user:id}});
-    setUsers(users.filter(user => user._id !== id));
+  async function handleLike() {
+    const [user,...rest] = users
+    await api.post('/devs/' + user._id + '/likes', null, {headers: {user:id}});
+    setUsers(rest);
   }
   async function handleLogout(){
     await AsyncStorage.clear()
@@ -59,11 +64,11 @@ export default function Main({navigation}) {
       </View>
     ))}
       </View>
-      <View style={styles.buttonsContainer}>
-        <TouchableOpacity style={styles.button}>
+      <View style={styles.buttonsContainer} >
+        <TouchableOpacity style={styles.button} onPress={handleDislike}>
           <Image source={dislike} />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={handleLike}>
           <Image source={like} />
         </TouchableOpacity>
       </View>
