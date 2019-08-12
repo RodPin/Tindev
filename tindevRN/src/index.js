@@ -1,7 +1,7 @@
 import React from 'react';
-import Appx from './src/index';
+import Login from './pages/Login';
 function App() {
-  return <Appx />;
+  return <Login />;
 }
 
 export default App;
