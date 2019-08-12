@@ -1,49 +1,37 @@
-import React, { useState, useEffect } from 'react';
-import {
-  KeyboardAvoidingView,
-  StyleSheet,
-  Image,
-  Platform,
-  Text,
-  TextInput,
-  TouchableOpacity,
-} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {KeyboardAvoidingView, StyleSheet, Image, Platform, Text, TextInput, TouchableOpacity} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import api from '../services/api';
 import logo from '../assets/logo.png';
 
-export default function Login({ navigation }) {
+export default function Login({navigation}) {
   const [user, setUser] = useState('');
-  useEffect(()=>{
-    AsyncStorage.getItem('user').then(user=>{
-        if(user){
-        navigation.navigate('Main', { userid:user });
+  useEffect(() => {
+    AsyncStorage.getItem('user').then(user => {
+      if (user) {
+        navigation.navigate('Main', {userid: user});
       }
-    })
-  },[])
+    });
+  }, []);
   async function handleLogin() {
     try {
-      const response = await api.post('/devs', { username: user });
-      const { _id } = response.data;
+      const response = await api.post('/devs', {username: user});
+      const {_id} = response.data;
       await AsyncStorage.setItem('user', _id);
-      navigation.navigate('Main', { userid:_id });
+      navigation.navigate('Main', {userid: _id});
     } catch (e) {
-      alert(e.message)
+      alert(e.message);
     }
   }
   return (
-    <KeyboardAvoidingView
-      behavior="padding"
-      enabled={Platform.OS == 'ios'}
-      style={styles.container}
-    >
+    <KeyboardAvoidingView behavior='padding' enabled={Platform.OS == 'ios'} style={styles.container}>
       <Image source={logo} />
       <TextInput
-        autoCapitalize="none"
+        autoCapitalize='none'
         autoCorrect={false}
         style={styles.input}
-        placeholderTextColor="#999"
-        placeholder="GitHub user"
+        placeholderTextColor='#999'
+        placeholder='GitHub user'
         onChangeText={setUser}
       />
       <TouchableOpacity style={styles.button} onPress={() => handleLogin()}>
@@ -69,7 +57,7 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     borderRadius: 4,
     marginTop: 20,
-    paddingHorizontal: 15,
+    paddingHorizontal: 15
   },
   button: {
     height: 46,
@@ -83,6 +71,6 @@ const styles = StyleSheet.create({
   btnText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 16,
-  },
+    fontSize: 16
+  }
 });
