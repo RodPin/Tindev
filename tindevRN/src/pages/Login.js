@@ -15,9 +15,11 @@ import logo from '../assets/logo.png';
 export default function Login({ navigation }) {
   const [user, setUser] = useState('');
   useEffect(()=>{
-      AsyncStorage.getItem('user').then(user=>{if(user){
+    AsyncStorage.getItem('user').then(user=>{
+        if(user){
         navigation.navigate('Main', { user });
-      }})
+      }
+    })
   },[])
   async function handleLogin() {
     try {
@@ -26,7 +28,7 @@ export default function Login({ navigation }) {
       await AsyncStorage.setItem('user', _id);
       navigation.navigate('Main', { _id });
     } catch (e) {
-      console.log(e);
+      alert(e.message)
     }
   }
   return (
