@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView, Text, Image, StyleSheet, View } from 'react-native';
 import logo from '../assets/logo.png';
+import AsyncStorage from '@react-native-community/async-storage';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import like from '../assets/like.png';
 import dislike from '../assets/dislike.png';
@@ -29,10 +30,16 @@ export default function Main({navigation}) {
     await api.post('/devs/' + id + '/likes', null, {headers: {user:id}});
     setUsers(users.filter(user => user._id !== id));
   }
-  
+  async function handleLogout(){
+    await AsyncStorage.clear()
+    navigation.navigate('Login')
+  }
   return (
     <SafeAreaView style={styles.container}>
+      <TouchableOpacity onPress={()=>handleLogout()}>
+
       <Image source={logo} />
+      </TouchableOpacity>
       <View style={styles.cardContainer}>
       {users.length==0 ?<Text style={styles.empty}>Acabou :(</Text>:
     users.map((user,i)=>(
