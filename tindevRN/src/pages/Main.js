@@ -1,29 +1,56 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { SafeAreaView, Text, Image, StyleSheet, View } from 'react-native';
 import logo from '../assets/logo.png';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-
 import like from '../assets/like.png';
 import dislike from '../assets/dislike.png';
-export default function Main() {
+import api from '../services/api';
+export default function Main({navigation}) {
+  const id = navigation.getParam('userid')
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    async function loadUsers() {
+      try {
+        const response = await api.get('/devs', {headers: {user:id}});
+        setUsers(response.data);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+    loadUsers();
+  }, [id]);
+
+  async function handleDislike(id) {
+    await api.post('/devs/' + id + '/dislikes', null, {headers: {user:id}});
+    setUsers(users.filter(user => user._id !== id));
+  }
+  async function handleLike(id) {
+    await api.post('/devs/' + id + '/likes', null, {headers: {user:id}});
+    setUsers(users.filter(user => user._id !== id));
+  }
+  
   return (
     <SafeAreaView style={styles.container}>
       <Image source={logo} />
       <View style={styles.cardContainer}>
-        <View style={styles.card}>
-          <Image
-            style={styles.avatar}
-            source={{
-              uri: 'https://avatars2.githubusercontent.com/u/2254731?v=4'
-            }}
-          />
-          <View style={styles.footer}>
-            <Text style={styles.name}>Rodrigo</Text>
-            <Text numberOfLines={3} style={styles.bio}>
-              Sou um cara muito maneiro e nao sei o que estou fazendo aqui{' '}
-            </Text>
-          </View>
+      {users.length==0 ?<Text style={styles.empty}>Acabou :(</Text>:
+    users.map((user,i)=>(
+      <View style={[styles.card,{zIndex:users.length-i}]} key={user._id}>
+        <Image
+          style={styles.avatar}
+          source={{
+            uri: user.avatar
+          }}
+        />
+        <View style={styles.footer}>
+          <Text style={styles.name}>{user.name}</Text>
+          <Text numberOfLine s={3} style={styles.bio}>
+            {user.bio}
+          </Text>
         </View>
+      </View>
+    ))}
       </View>
       <View style={styles.buttonsContainer}>
         <TouchableOpacity style={styles.button}>
@@ -104,6 +131,8 @@ const styles = StyleSheet.create({
     shadowOffset: {
       width: 0,
       height: 2,
-    },
-  },
+    }
+  },empty:{
+    alignSelf:'center',color:'#999',fontSize:24,fontWeight:'bold'
+  }
 });

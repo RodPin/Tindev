@@ -17,7 +17,7 @@ export default function Login({ navigation }) {
   useEffect(()=>{
     AsyncStorage.getItem('user').then(user=>{
         if(user){
-        navigation.navigate('Main', { user });
+        navigation.navigate('Main', { userid:user });
       }
     })
   },[])
@@ -26,7 +26,7 @@ export default function Login({ navigation }) {
       const response = await api.post('/devs', { username: user });
       const { _id } = response.data;
       await AsyncStorage.setItem('user', _id);
-      navigation.navigate('Main', { _id });
+      navigation.navigate('Main', { userid:_id });
     } catch (e) {
       alert(e.message)
     }
