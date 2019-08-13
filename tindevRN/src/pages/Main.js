@@ -6,9 +6,12 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import like from '../assets/like.png';
 import dislike from '../assets/dislike.png';
 import api from '../services/api';
+import io from 'socket.io-client';
+import ItsAMatch from '../assets/itsamatch.png';
 export default function Main({navigation}) {
   const id = navigation.getParam('userid');
   const [users, setUsers] = useState([]);
+  const [matchDev, setMatchDev] = useState();
 
   useEffect(() => {
     async function loadUsers() {
@@ -20,6 +23,15 @@ export default function Main({navigation}) {
       }
     }
     loadUsers();
+  }, [id]);
+
+  useEffect(() => {
+    const socket = io('http://localhost:3333', {
+      query: {user: id}
+    });
+    socket.on('match', dev => {
+      setMatchDev(dev);
+    });
   }, [id]);
 
   async function handleDislike() {
@@ -44,7 +56,7 @@ export default function Main({navigation}) {
       <TouchableOpacity onPress={() => handleLogout()}>
         <Image source={logo} />
       </TouchableOpacity>
-      <View style={styles.cardContainer}>
+      <View style={styles.cardsContainer}>
         {users.length == 0 ? (
           <Text style={styles.empty}>Acabou :(</Text>
         ) : (
@@ -76,6 +88,19 @@ export default function Main({navigation}) {
           </TouchableOpacity>
         </View>
       )}
+      {matchDev && (
+        <View style={styles.matchContainer}>
+          <Image style={styles.matchImage} source={ItsAMatch} />
+          <Image style={styles.matchAvatar} source={{uri: matchDev.avatar}} />
+
+          <Text style={styles.matchName}>{matchDev.name}</Text>
+          <Text style={styles.matchBio}>{matchDev.bio}</Text>
+
+          <TouchableOpacity onPress={() => setMatchDev(null)}>
+            <Text style={styles.closeMatch}>FECHAR</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -87,60 +112,76 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between'
   },
-  cardContainer: {
+
+  logo: {
+    marginTop: 30
+  },
+
+  empty: {
+    alignSelf: 'center',
+    color: '#999',
+    fontSize: 24,
+    fontWeight: 'bold'
+  },
+
+  cardsContainer: {
     flex: 1,
     alignSelf: 'stretch',
     justifyContent: 'center',
     maxHeight: 500
   },
+
   card: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#DDD',
     borderRadius: 8,
     margin: 30,
     overflow: 'hidden',
     position: 'absolute',
     top: 0,
-    bottom: 0,
+    left: 0,
     right: 0,
-    left: 0
+    bottom: 0
   },
+
   avatar: {
     flex: 1,
     height: 300
   },
-  logo: {marginTop: 30},
+
   footer: {
-    backgroundColor: '#fff',
+    backgroundColor: '#FFF',
     paddingHorizontal: 20,
     paddingVertical: 15
   },
+
   name: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333'
   },
+
   bio: {
     fontSize: 14,
     color: '#999',
     marginTop: 5,
     lineHeight: 18
   },
+
   buttonsContainer: {
     flexDirection: 'row',
     marginBottom: 30
   },
+
   button: {
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFF',
     justifyContent: 'center',
     alignItems: 'center',
     marginHorizontal: 20,
-    //android
     elevation: 2,
-    //ios
     shadowColor: '#000',
     shadowOpacity: 0.05,
     shadowRadius: 2,
@@ -149,10 +190,49 @@ const styles = StyleSheet.create({
       height: 2
     }
   },
-  empty: {
-    alignSelf: 'center',
-    color: '#999',
-    fontSize: 24,
+
+  matchContainer: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000 //always on top
+  },
+
+  matchImage: {
+    height: 60,
+    resizeMode: 'contain'
+  },
+
+  matchAvatar: {
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    borderWidth: 5,
+    borderColor: '#FFF',
+    marginVertical: 30
+  },
+
+  matchName: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    color: '#FFF'
+  },
+
+  matchBio: {
+    marginTop: 10,
+    fontSize: 16,
+    color: 'rgba(255, 255, 255, 0.8)',
+    lineHeight: 24,
+    textAlign: 'center',
+    paddingHorizontal: 30
+  },
+
+  closeMatch: {
+    fontSize: 16,
+    color: 'rgba(255, 255, 255, 0.8)',
+    textAlign: 'center',
+    marginTop: 30,
     fontWeight: 'bold'
   }
 });
