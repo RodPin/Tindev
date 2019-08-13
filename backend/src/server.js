@@ -10,7 +10,10 @@ const server = require('http').Server(httpServer);
 const io = require('socket.io')(server);
 
 io.on('connection', socket => {
-  console.log('New connectino', socket.id);
+  console.log('New connection', socket.id);
+  socket.on('hello', message => {
+    console.log(message);
+  });
 });
 
 mongoose.connect('mongodb+srv://Rodrigo:senha123@omni8-ovtmr.mongodb.net/omni8?retryWrites=true&w=majority', {
