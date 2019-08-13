@@ -70,7 +70,7 @@ export default function Main({navigation}) {
               />
               <View style={styles.footer}>
                 <Text style={styles.name}>{user.name}</Text>
-                <Text numberOfLine s={3} style={styles.bio}>
+                <Text numberOfLines={3} style={styles.bio}>
                   {user.bio}
                 </Text>
               </View>
