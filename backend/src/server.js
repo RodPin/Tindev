@@ -9,15 +9,22 @@ const httpServer = express();
 const server = require('http').Server(httpServer);
 const io = require('socket.io')(server);
 
+const connectedUsers = {};
+
 io.on('connection', socket => {
-  console.log('New connection', socket.id);
-  socket.on('hello', message => {
-    console.log(message);
-  });
+  const {user} = socket.handshake.query;
+  connectedUsers[user] = socket.id;
 });
 
 mongoose.connect('mongodb+srv://Rodrigo:senha123@omni8-ovtmr.mongodb.net/omni8?retryWrites=true&w=majority', {
   useNewUrlParser: true
+});
+
+//node middleware to send connectedusers to controllers
+httpServer.use((req, res, next) => {
+  req.io = io;
+  req.connectedUsers = connectedUsers;
+  return next();
 });
 
 httpServer.use(cors());

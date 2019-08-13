@@ -20,13 +20,12 @@ export default function Main({match}) {
   }, [match.params.id]);
 
   useEffect(() => {
-    const socket = io('http://localhost:3333');
-
-    setTimeout(() => {
-      socket.emit('hello', {
-        message: 'Hello World'
-      });
-    }, 3000);
+    const socket = io('http://localhost:3333', {
+      query: {user: match.params.id}
+    });
+    socket.on('match', dev => {
+      console.log(dev);
+    });
   }, [match.params.id]);
 
   async function handleDislike(id) {
