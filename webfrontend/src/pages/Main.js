@@ -5,8 +5,12 @@ import logo from '../assets/logo.svg';
 import like from '../assets/like.svg';
 import dislike from '../assets/dislike.svg';
 import api from '../services/api';
+import ItsaMatch from '../assets/match.png';
+
 export default function Main({match}) {
   const [users, setUsers] = useState([]);
+  const [matchDev, setMatchDev] = useState(null);
+
   useEffect(() => {
     async function loadUsers() {
       try {
@@ -24,7 +28,7 @@ export default function Main({match}) {
       query: {user: match.params.id}
     });
     socket.on('match', dev => {
-      console.log(dev);
+      setMatchDev(dev);
     });
   }, [match.params.id]);
 
@@ -62,6 +66,17 @@ export default function Main({match}) {
         </ul>
       ) : (
         <div className='empty'>Acabou :( </div>
+      )}
+      {matchDev && (
+        <div className='match-container'>
+          <img src={ItsaMatch} alt='match' />
+          <img className='avatar' src={matchDev.avatar} />
+          <strong>{matchDev.name}</strong>
+          <p>{matchDev.bio}</p>
+          <button type='button' onClick={() => setMatchDev(null)}>
+            FECHAR
+          </button>
+        </div>
       )}
     </div>
   );
